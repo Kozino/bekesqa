@@ -789,17 +789,14 @@ body {
 <section class="reviews-section" id="reviews">
   
 <div class="reviews-header reveal">
-    <div class="section-label">Guest Reviews</div>
-    <h2 class="section-title">What Our Guests <em>Say</em></h2>
-    <div class="stars-row">
-        <span class="stars" id="averageStars">★★★★★</span>
-        <span class="rating-text" id="averageRating">5.0</span>
-        <span class="rating-sub" id="reviewCount">Based on 0+ reviews</span>
-    </div>
-</div>
-<div class="reviews-grid" id="reviewsGrid">
-    <div class="loading-reviews">Loading Google Reviews...</div>
-</div>
+  <div class="reviews-grid">
+    <div class="review-card reveal"><div class="review-stars">★★★★★</div><p class="review-text">The jollof rice here is absolutely incredible — smoky, perfectly seasoned, just like my mother used to make back in Lagos. This place is a gem in Pearl Qatar!</p><div class="review-author"><div class="review-avatar">AO</div><div><div class="review-name">Amara Okafor</div><div class="review-location">Lagos, Nigeria</div></div></div></div>
+    <div class="review-card reveal"><div class="review-stars">★★★★★</div><p class="review-text">As a Qatari who had never tried Nigerian food, BEKES completely changed my perspective. The pepper soup was a revelation — spicy, warming, deeply aromatic.</p><div class="review-author"><div class="review-avatar">FA</div><div><div class="review-name">Fatima Al-Rashid</div><div class="review-location">Doha, Qatar</div></div></div></div>
+    <div class="review-card reveal"><div class="review-stars">★★★★★</div><p class="review-text">Best suya I've had outside of Nigeria, hands down. The spice blend is authentic and the service was warm and welcoming. Will definitely be back every week!</p><div class="review-author"><div class="review-avatar">KB</div><div><div class="review-name">Kwame Boateng</div><div class="review-location">Accra, Ghana</div></div></div></div>
+    <div class="review-card reveal"><div class="review-stars">★★★★★</div><p class="review-text">BEKES brings so much flavour and culture to The Pearl. The egusi soup with pounded yam is soul food at its finest. Every mouthful tells a rich story.</p><div class="review-author"><div class="review-avatar">IM</div><div><div class="review-name">Isabelle Moreau</div><div class="review-location">Paris, France</div></div></div></div>
+    <div class="review-card reveal"><div class="review-stars">★★★★★</div><p class="review-text">A must-visit for anyone in Qatar. The asun is phenomenal — great ambiance, attentive staff, and food that genuinely makes you feel at home.</p><div class="review-author"><div class="review-avatar">EN</div><div><div class="review-name">Emmanuel Nwosu</div><div class="review-location">Abuja, Nigeria</div></div></div></div>
+    <div class="review-card reveal"><div class="review-stars">★★★★★</div><p class="review-text">We hosted a team dinner at BEKES and everyone was blown away. Incredible food, generous portions, and a dining experience unlike anything else in Qatar.</p><div class="review-author"><div class="review-avatar">RC</div><div><div class="review-name">Raj Chandrasekaran</div><div class="review-location">Mumbai, India</div></div></div></div>
+  </div>
 </section>
 
 <section class="gallery-section">
@@ -947,137 +944,5 @@ body {
   function openApp(e,app){e.preventDefault();const l=appLinks[app],ua=navigator.userAgent;window.open(/iPad|iPhone|iPod/.test(ua)?l.ios:/Android/.test(ua)?l.android:l.web,"_blank");closeModal();}
 </script>
 
-<script>
-// Google Places API configuration
-// IMPORTANT: Replace 'YOUR_API_KEY' with your actual Google Places API key
-// Get your API key from: https://console.cloud.google.com/google/maps-apis
-const GOOGLE_API_KEY = 'AIzaSyAji3qSedgbfAWpWeUurGv7trLR_FWqz-Q'; // <-- REPLACE THIS
-const PLACE_ID = 'ChIJAduP2IfDRT4RGOBJcvIV5Ps'; // BEKES Pearl Qatar Place ID
-
-async function fetchGoogleReviews() {
-    try {
-        const response = await fetch(
-            `https://maps.googleapis.com/maps/api/place/details/json?place_id=${ChIJAduP2IfDRT4RGOBJcvIV5Ps}&fields=name,rating,reviews,user_ratings_total&key=${AIzaSyAji3qSedgbfAWpWeUurGv7trLR_FWqz-Q}`
-        );
-        const data = await response.json();
-        
-        if (data.result) {
-            displayReviews(data.result);
-        } else {
-            console.error('No reviews found', data);
-            displayFallbackReviews();
-        }
-    } catch (error) {
-        console.error('Error fetching reviews:', error);
-        displayFallbackReviews();
-    }
-}
-
-function displayReviews(placeData) {
-    const reviewsGrid = document.getElementById('reviewsGrid');
-    const averageRating = placeData.rating || 5.0;
-    const totalReviews = placeData.user_ratings_total || 0;
-    const reviews = placeData.reviews || [];
-    
-    // Update header stats
-    updateRatingDisplay(averageRating, totalReviews);
-    
-    if (reviews.length === 0) {
-        reviewsGrid.innerHTML = '<div class="loading-reviews">No reviews yet. Be the first to review us on Google!</div>';
-        return;
-    }
-    
-    // Sort reviews by newest first
-    const sortedReviews = [...reviews].sort((a, b) => b.time - a.time);
-    
-    // Display top 6 most recent reviews
-    const reviewsHTML = sortedReviews.slice(0, 6).map(review => {
-        const authorName = review.author_name || 'Google User';
-        const rating = review.rating || 5;
-        const stars = '★'.repeat(rating) + '☆'.repeat(5 - rating);
-        const date = new Date(review.time * 1000).toLocaleDateString('en-US', {
-            year: 'numeric',
-            month: 'short',
-            day: 'numeric'
-        });
-        const avatarInitial = authorName.charAt(0).toUpperCase();
-        
-        return `
-            <div class="review-card reveal">
-                <div class="review-stars">${stars}</div>
-                <p class="review-text">${escapeHtml(review.text || 'No review text provided.')}</p>
-                <div class="review-author">
-                    <div class="review-avatar">${avatarInitial}</div>
-                    <div>
-                        <div class="review-name">${escapeHtml(authorName)}</div>
-                        <div class="review-location">${escapeHtml(review.relative_time_description || 'Google Review')}</div>
-                        <div class="review-date">${date}</div>
-                    </div>
-                </div>
-            </div>
-        `;
-    }).join('');
-    
-    reviewsGrid.innerHTML = reviewsHTML;
-    
-    // Re-trigger reveal animations
-    document.querySelectorAll('.review-card.reveal').forEach(el => {
-        if (window.IntersectionObserver) {
-            const observer = new IntersectionObserver(entries => {
-                entries.forEach(entry => {
-                    if (entry.isIntersecting) {
-                        entry.target.classList.add('visible');
-                        observer.unobserve(entry.target);
-                    }
-                });
-            }, { threshold: 0.1 });
-            observer.observe(el);
-        }
-    });
-}
-
-function updateRatingDisplay(rating, total) {
-    const fullStars = Math.floor(rating);
-    const starsHTML = '★'.repeat(fullStars) + '☆'.repeat(5 - fullStars);
-    
-    document.getElementById('averageStars').innerHTML = starsHTML;
-    document.getElementById('averageRating').innerHTML = rating.toFixed(1);
-    document.getElementById('reviewCount').innerHTML = `Based on ${total}+ reviews`;
-}
-
-function displayFallbackReviews() {
-    // Fallback to static reviews if API fails
-    const fallbackReviews = [
-        { author_name: "Amara Okafor", rating: 5, text: "The jollof rice here is absolutely incredible — smoky, perfectly seasoned, just like my mother used to make back in Lagos. This place is a gem in Pearl Qatar!", relative_time_description: "2 weeks ago" },
-        { author_name: "Fatima Al-Rashid", rating: 5, text: "As a Qatari who had never tried Nigerian food, BEKES completely changed my perspective. The pepper soup was a revelation — spicy, warming, deeply aromatic.", relative_time_description: "1 month ago" },
-        { author_name: "Kwame Boateng", rating: 5, text: "Best suya I've had outside of Nigeria, hands down. The spice blend is authentic and the service was warm and welcoming.", relative_time_description: "3 weeks ago" },
-        { author_name: "Isabelle Moreau", rating: 5, text: "BEKES brings so much flavour and culture to The Pearl. The egusi soup with pounded yam is soul food at its finest.", relative_time_description: "2 months ago" }
-    ];
-    
-    updateRatingDisplay(5.0, 128);
-    displayReviews({ reviews: fallbackReviews, rating: 5.0, user_ratings_total: 128 });
-}
-
-function escapeHtml(text) {
-    const div = document.createElement('div');
-    div.textContent = text;
-    return div.innerHTML;
-}
-
-// Fetch reviews when page loads
-document.addEventListener('DOMContentLoaded', () => {
-    if (GOOGLE_API_KEY !== 'AIzaSyAji3qSedgbfAWpWeUurGv7trLR_FWqz-Q') {
-        fetchGoogleReviews();
-    } else {
-        console.warn('Please add your Google API key to fetch real reviews');
-        displayFallbackReviews();
-    }
-});
-
-// Refresh reviews every 30 minutes (1800000 milliseconds)
-if (GOOGLE_API_KEY !== 'AIzaSyAji3qSedgbfAWpWeUurGv7trLR_FWqz-Q') {
-    setInterval(fetchGoogleReviews, 1800000);
-}
-</script>
 </body>
 </html>
